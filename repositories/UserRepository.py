@@ -1,6 +1,7 @@
 import motor.motor_asyncio
 from decouple import config
-from bson import ObjectId
+# from bson import ObjectId
+from bson.objectid import ObjectId
 from models.UserModel import UserCreateModel
 from utils.AuthUtil import AuthUtil
 
