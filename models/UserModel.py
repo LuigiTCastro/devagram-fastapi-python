@@ -1,21 +1,22 @@
+from typing import Optional
 from pydantic import BaseModel, Field, EmailStr
 from utils.DecoratorUtil import DecoratorUtil
 
-
 decoratorUtil = DecoratorUtil()
 
+
 class UserModel(BaseModel):
-    id: str = Field(...)
+    id: Optional[str] = Field(None, alias='_id')
     name: str = Field(...)
     email: EmailStr = Field(...)
     password: str = Field(...)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'user': {
-                'name': 'fulano',
-                'email': 'fulano@email.com',
-                'password': 'password123',
+                'name': 'string',
+                'email': 'string',
+                'password': 'string',
             }
         }
 
@@ -27,11 +28,11 @@ class UserCreateModel(BaseModel):
     password: str = Field(...)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'user': {
-                'name': 'fulano',
-                'email': 'fulano@email.com',
-                'password': 'password123'
+                'name': 'string',
+                'email': 'string',
+                'password': 'string'
             }
         }
 
@@ -41,9 +42,9 @@ class UserLoginModel(BaseModel):
     password: str = Field(...)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'user': {
-                'email': 'fulano@email.com',
-                'password': 'password123',
+                'email': 'string',
+                'password': 'string',
             }
         }

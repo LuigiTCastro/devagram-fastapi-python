@@ -8,7 +8,7 @@ authService = AuthService()
 jwtToken = JwtToken()
 
 
-@router.post('/login', response_description='Login')
+@router.post('/login', response_description='Route to make Login')
 async def login_route(user: UserLoginModel = Body(...)):
     result = await authService.login_service(user)
 

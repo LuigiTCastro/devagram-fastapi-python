@@ -9,7 +9,6 @@ authUtil = AuthUtil()
 class AuthService:
 
     async def login_service(self, user: UserLoginModel):
-
         try:
             wanted_user = await userRepository.find_user_by_email(user.email)
 

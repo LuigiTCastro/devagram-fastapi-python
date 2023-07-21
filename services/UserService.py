@@ -10,7 +10,7 @@ class UserService:
         try:
             wanted_user = await userRepository.find_user_by_email(user.email)
 
-            if wanted_user:
+            if wanted_user is not None:
                 return {
                     'message': 'User already exists.',
                     'data': '',
@@ -32,7 +32,7 @@ class UserService:
                 'status': 500
             }
 
-    async def find_user_by_id(id: str):
+    async def find_user_by_id(self, id: str):
         try:
             wanted_user = await userRepository.find_user_by_id(id)
 

@@ -1,6 +1,6 @@
-def UserHelper(user):
+def user_helper(user):
     return {
-        'id': user['_id'],
+        'id': str(user['_id']),  # turns the ObjectId into Str.
         'name': user['name'],
         'email': user['email'],
         'password': user['password'],
