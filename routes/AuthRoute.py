@@ -15,8 +15,16 @@ async def login_route(user: UserLoginModel = Body(...)):
     if not result['status'] == 200:
         raise HTTPException(status_code=result['status'], detail=result['message'])
 
+    data = result.get('data', {})  # Checks if 'data' is present in the results.
+    user_id = data.get('id')  # Gets the user ID, if present.
+
+    if not user_id:
+        raise HTTPException(status_code=500, detail='ID of the user not found in the login results')
+
+    # del data['password']  # Alternative
+    # data['token'] = token  # Alternative
     del result['data']['password']
-    token = jwtToken.generate_jwt_token(['data']['id'])
+    token = jwtToken.generate_jwt_token(user_id)
     result['data']['token'] = token
 
     return result

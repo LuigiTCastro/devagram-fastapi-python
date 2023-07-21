@@ -20,6 +20,7 @@ class AuthService:
                 }
 
             if authUtil.decrypt_password(user.password, wanted_user['password']):
+                wanted_user['id'] = str(wanted_user.pop('_id'))
                 return {
                     'message': 'Login successfully realized.',
                     'data': wanted_user,

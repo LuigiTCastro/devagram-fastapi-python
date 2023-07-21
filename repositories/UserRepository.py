@@ -4,16 +4,7 @@ from decouple import config
 from bson.objectid import ObjectId
 from models.UserModel import UserCreateModel
 from utils.AuthUtil import AuthUtil
-
 from utils.UserHelper import user_helper
-
-# def user_helper(user):
-#     return {
-#         'id': user['_id'],
-#         'name': user['name'],
-#         'email': user['email'],
-#         'password': user['password'],
-#     }
 
 
 MONGODB_URL = config('MONGODB_URL')
