@@ -10,6 +10,7 @@ class UserModel(BaseModel):
     name: str = Field(...)
     email: EmailStr = Field(...)
     password: str = Field(...)
+    photo: str = Field(...)
 
     class Config:
         json_schema_extra = {
@@ -17,6 +18,7 @@ class UserModel(BaseModel):
                 'name': 'string',
                 'email': 'string',
                 'password': 'string',
+                'photo': 'string'
             }
         }
 

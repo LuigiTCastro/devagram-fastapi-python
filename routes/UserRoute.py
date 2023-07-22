@@ -10,8 +10,8 @@ jwtToken = JwtToken()
 
 
 @router.post('/register', response_description='Route to create a new user.')
-# async def register_user(file: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
-async def register_user(user: UserCreateModel = Depends(UserCreateModel)):
+# async def register_user(user: UserCreateModel = Depends(UserCreateModel)):
+async def register_user(file: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
     try:
         result = await userService.register_user(user)
 
