@@ -23,7 +23,7 @@ class UserModel(BaseModel):
         }
 
 
-# @decoratorUtil.form_body
+@decoratorUtil.form_body
 class UserCreateModel(BaseModel):
     name: str = Field(...)
     email: EmailStr = Field(...)

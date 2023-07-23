@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile
+import os
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File
 from middleware.JwtMiddleware import JwtMiddleware
 from models.UserModel import UserCreateModel
 from services.UserService import UserService
@@ -11,9 +13,16 @@ jwtToken = JwtToken()
 
 @router.post('/register', response_description='Route to create a new user.')
 # async def register_user(user: UserCreateModel = Depends(UserCreateModel)):
-async def register_user(file: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
+async def register_user(file: UploadFile = File(...), user: UserCreateModel = Depends(UserCreateModel)):
     try:
-        result = await userService.register_user(user)
+        print(file.filename)
+        photo_path = f'file/{file.filename}.png'
+
+        with open(photo_path, 'wb+') as file:
+            file.write(file.read())
+
+        result = await userService.register_user(user, photo_path)
+        os.remove(photo_path)
 
         if not result['status'] == 201:
             raise HTTPException(status_code=result['status'], detail=result['message'])

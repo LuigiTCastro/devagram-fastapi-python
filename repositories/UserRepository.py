@@ -43,6 +43,10 @@ class UserRepository:
                 {"_id": ObjectId(id)}, {"$set": user_data}
             )
 
+            wanted_user = await user_collection.find_one({
+                {"id": ObjectId(id)}
+            })
+
             return user_helper(updated_user)  # Check
 
         else:
