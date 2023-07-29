@@ -12,14 +12,13 @@ jwtToken = JwtToken()
 
 
 @router.post('/register', response_description='Route to create a new user.')
-# async def register_user(user: UserCreateModel = Depends(UserCreateModel)):
-async def register_user(file: UploadFile = File(...), user: UserCreateModel = Depends(UserCreateModel)):
+async def register_user(file: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
     try:
         print(file.filename)
         photo_path = f'file/{file.filename}.png'
 
-        with open(photo_path, 'wb+') as file:
-            file.write(file.read())
+        with open(photo_path, 'wb+') as f:
+            f.write(file.file.read())
 
         result = await userService.register_user(user, photo_path)
         os.remove(photo_path)
@@ -41,7 +40,7 @@ async def register_user(file: UploadFile = File(...), user: UserCreateModel = De
     response_description='Route that returns information about the logged user.',
     dependencies=[Depends(JwtMiddleware.verify_token)]
 )
-async def get_logged_user_info(authorization: str = Header(default='')):
+async def get_logged_user_info(authorization: str = Header(default='')): # ITS NOT WORKING
     try:
         print(authorization)
         token = authorization.split(' ')[1]
@@ -54,5 +53,5 @@ async def get_logged_user_info(authorization: str = Header(default='')):
         return result
 
     except Exception as error:
-        print(error)
-        raise HTTPException(status_code=500, detail='Server internal error.')
+        # raise HTTPException(status_code=500, detail='Server internal error.')
+        raise error

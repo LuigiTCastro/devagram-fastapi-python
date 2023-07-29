@@ -4,7 +4,7 @@ from decouple import config
 from bson.objectid import ObjectId
 from models.UserModel import UserCreateModel
 from utils.AuthUtil import AuthUtil
-from utils.UserHelper import user_helper
+from helpers.UserHelper import user_helper
 
 
 MONGODB_URL = config('MONGODB_URL')
@@ -44,15 +44,15 @@ class UserRepository:
             )
 
             wanted_user = await user_collection.find_one({
-                {"id": ObjectId(id)}
+                {"_id": ObjectId(id)}
             })
 
-            return user_helper(updated_user)  # Check
+            return user_helper(wanted_user)  # Check
 
         else:
             return None
 
-    async def delete_user(self, id: str):
+    async def remove_user(self, id: str):
         user = await user_collection.find_one({"_id": ObjectId(id)})  # Check
         if user:
             await user_collection.delete_one({"_id": ObjectId(id)})

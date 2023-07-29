@@ -27,7 +27,7 @@ class UserService:
                         f'profile-photos/{new_user["id"]}.png'
                     )
 
-                    new_user = await userRepository.update_user(new_user['id'], {'photo', photo_url})
+                    new_user = await userRepository.update_user(new_user['id'], {'photo': photo_url})
 
                 except Exception as error:
                     print(error)
