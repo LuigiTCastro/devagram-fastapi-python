@@ -21,11 +21,15 @@ class UserRepository:
     async def create_user(self, user: UserCreateModel) -> dict:
         user.password = authUtil.encrypt_password(user.password)
         created_user = await user_collection.insert_one(user.__dict__)
+        # .__dict__: converts the attributes of a class into a dictionary.
+
         new_user = await user_collection.find_one({'_id': created_user.inserted_id})
         return user_helper(new_user)
 
-    async def list_users(self):
-        return user_collection.find()
+    async def find_users(self) -> dict:
+        users_found = await user_collection.find()
+        return user_helper(users_found)
+
 
     async def find_user_by_email(self, email: str):
         user = await user_collection.find_one({'email': email})
@@ -34,20 +38,24 @@ class UserRepository:
     async def find_user_by_id(self, id: str):
         user = await user_collection.find_one({'_id': ObjectId(id)})
         return user_helper(user)
+        # ObjectId: is an object field created automatically by MongoDB to identify documents.
 
     async def update_user(self, id: str, user_data: dict):
+        if 'password' in user_data:
+            user_data['password'] = authUtil.encrypt_password(user_data['password'])
+
         user = await user_collection.find_one({"_id": ObjectId(id)})
 
         if user:
-            updated_user = await user_collection.update_one(
+            await user_collection.update_one(
                 {"_id": ObjectId(id)}, {"$set": user_data}
             )
 
-            wanted_user = await user_collection.find_one({
+            updated_user = await user_collection.find_one({
                 {"_id": ObjectId(id)}
             })
 
-            return user_helper(wanted_user)  # Check
+            return user_helper(updated_user)  # Check
 
         else:
             return None

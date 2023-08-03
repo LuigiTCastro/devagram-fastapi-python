@@ -8,6 +8,7 @@ authService = AuthService()
 jwtToken = JwtToken()
 
 
+# POST is used in a Login Route to be more secure by encapsulating sensitive data in the body.
 @router.post('/login', response_description='Route to make Login')
 async def login_route(user: UserLoginModel = Body(...)):
     result = await authService.login_service(user)

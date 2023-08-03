@@ -3,7 +3,10 @@ from decouple import config
 
 import boto3
 # boto3 is a lib and the official AWS SDK for python to integrate with Amazon S3 for image uploads using FastApi.
+# S3 Amazon is a service of files/objects storage provided by AWS.
+# AWS principally offers IaaS services. [IaaS: Infrastructure as a Service].
 
+# The Provider Layer's main purpose is to enable the use of third-party libraries/services in our application.
 
 
 class AWSProvider:

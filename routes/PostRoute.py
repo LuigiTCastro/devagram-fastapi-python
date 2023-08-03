@@ -1,35 +1,69 @@
-import os
-
-from fastapi import APIRouter, UploadFile, HTTPException, Depends, File
+from fastapi import APIRouter, UploadFile, HTTPException, Depends, File, Header
+from middleware.JwtMiddleware import JwtMiddleware
 from models.PostModel import PostCreateModel
+from services.AuthService import AuthService
 from services.PostService import PostService
+from services.UserService import UserService
+from utils.JwtToken import JwtToken
 
 postService = PostService()
+userService = UserService()
+authService = AuthService()
+jwtToken = JwtToken()
 router = APIRouter()
 
 
-class PostRoute:
+@router.post(
+    '/register',
+    response_description='Route that creates a new publish.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+# async def register_post(file: UploadFile = File(...), post: PostCreateModel = Depends(PostCreateModel)):
+async def register_post(
+        authorization: str = Header(default=''),
+        post: PostCreateModel = Depends(PostCreateModel)
+):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await postService.register_post(post, logged_user['id'])
 
-    @router.post('/register', response_description='Route that creates a new publish.')
-    async def register_post(self, file: UploadFile = File(...), post: PostCreateModel = Depends(PostCreateModel)):
-        try:
-            print(file.filename)
-            photo_path = f'file/{file.filename}.png'
+        if not result['status'] == 201:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
 
-            with open(photo_path, 'wb+') as file:
-                file.write(file.read())
+        return result
 
-            result = await postService.register_post(post, photo_path)
-            os.remove(photo_path)
+    except Exception as error:
+        print(error)
 
-            if not result['status'] == 201:
-                raise HTTPException(status_code=result['status'], detail=result['message'])
 
-            return result
+@router.get('/get', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
+# async def get_post(authorization: str = Header(default='')):
+async def get_post(id: str):
+    try:
+        # token = authorization.split(' ')[1]
+        # payload = jwtToken.decode_jwt_token(token)
+        # logged_user = await userService.find_user_by_id(payload['user_id'])\
 
-        except Exception as error:
-            print(error)
+        result = await postService.find_post_by_id(id)
 
-    @router.get('/get', response_description='...')
-    async def get_post(self):
-        pass
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        raise error
+
+
+@router.get('/list', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
+async def get_posts():
+    try:
+        result = await postService.list_posts()
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        raise error

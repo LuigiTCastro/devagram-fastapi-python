@@ -1,4 +1,6 @@
 from typing import Optional
+
+from fastapi import UploadFile
 from pydantic import BaseModel, Field, EmailStr
 from utils.DecoratorUtil import DecoratorUtil
 
@@ -48,5 +50,22 @@ class UserLoginModel(BaseModel):
             'user': {
                 'email': 'string',
                 'password': 'string',
+            }
+        }
+
+@decoratorUtil.form_body
+class UserUpdateModel(BaseModel):
+    name: str = Field(...)
+    email: EmailStr = Field(...)
+    password: str = Field(...)
+    photo: UploadFile = Field(...)
+
+    class Config:
+        json_schema_extra = {
+            'user': {
+                'name': 'string',
+                'email': 'string',
+                'password': 'string',
+                'photo': 'string'
             }
         }
