@@ -12,7 +12,6 @@ awsProvider = AWSProvider()
 
 class PostService:
     async def register_post(self, post: PostCreateModel, user_id):
-        # async def register_post(self, post: PostCreateModel):
         try:
             created_post = await postRepository.create_post(post, user_id)
             # photo_upload = created_post.photo
@@ -37,7 +36,7 @@ class PostService:
 
             return {
                 'message': 'Post successfully realized.',
-                'data': new_post,
+                'data': new_post,  # ??
                 'status': 201
             }
 
@@ -48,9 +47,9 @@ class PostService:
                 'status': 500
             }
 
-    async def find_post_by_id(self, id: str):
+    async def find_post_by_id(self, post_id: str):
         try:
-            wanted_post = await postRepository.find_post_by_id(id)
+            wanted_post = await postRepository.find_post_by_id(post_id)
 
             if wanted_post is None:
                 return {
@@ -60,7 +59,7 @@ class PostService:
                 }
 
             return {
-                'message': '',
+                'message': 'Post successfully found.',
                 'data': wanted_post,
                 'status': 200
             }
@@ -72,12 +71,19 @@ class PostService:
                 'status': 500
             }
 
-    async def list_posts(self):
+    async def list_posts(self):  # IT'S NOT WORKING
         try:
             posts_found = await postRepository.find_posts()
 
-            for p in posts_found:
-                p.total_likes = len(p.likes)
+            # for p in posts_found:
+            #     p.total_likes = len(p.likes)
+
+            if posts_found is None:
+                return {
+                    'message': 'Posts not found.',
+                    'data': '',
+                    'status': 404
+                }
 
             return {
                 'message': 'Posts successfully listed.',
@@ -92,7 +98,7 @@ class PostService:
                 'status': 500
             }
 
-    async def register_like(self, post_id: str, user_id: str):
+    async def register_like_or_dislike(self, post_id: str, user_id: str):
         try:
             post_found = await postRepository.find_post_by_id(post_id)
 

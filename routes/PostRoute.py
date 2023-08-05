@@ -35,15 +35,14 @@ async def register_post(
         print(error)
 
 
-@router.get('/get', response_description='Route responsible for obtaining the data of a publish through the id.', dependencies=[Depends(JwtMiddleware.verify_token)])
-# async def get_post(authorization: str = Header(default='')):
-async def get_post(id: str):
+@router.get(
+    '/get/{post_id}',
+    response_description='Route responsible for obtaining the data of a publish through the id.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def get_post_info(post_id: str):
     try:
-        # token = authorization.split(' ')[1]
-        # payload = jwtToken.decode_jwt_token(token)
-        # logged_user = await userService.find_user_by_id(payload['user_id'])\
-
-        result = await postService.find_post_by_id(id)
+        result = await postService.find_post_by_id(post_id)
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])
@@ -54,7 +53,11 @@ async def get_post(id: str):
         raise error
 
 
-@router.get('/list', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
+@router.get(
+    '/list',
+    response_description='Route responsible for listing all posts of the database.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
 async def get_posts_list():
     try:
         result = await postService.list_posts()
@@ -68,11 +71,15 @@ async def get_posts_list():
         raise error
 
 
-@router.put('/like/{post_id}', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
-async def post_like(post_id: str, authorization: str = Header(default='')):
+@router.put(
+    '/like/{post_id}',
+    response_description='Responsible route to like/dislike a post.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def post_like_or_dislike(post_id: str, authorization: str = Header(default='')):
     try:
         logged_user = await authService.get_logged_user(authorization)
-        result = await postService.register_like(post_id, logged_user['id'])
+        result = await postService.register_like_or_dislike(post_id, logged_user['id'])
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])

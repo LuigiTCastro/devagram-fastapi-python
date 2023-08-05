@@ -37,14 +37,15 @@ class PostRepository:
             }
         }])
 
-        posts = []
+        posts_collection = []
+
         async for post in posts_found:
-            posts.append(post_helper(post))
+            posts_collection.append(post_helper(post))
 
-        return posts
+        return posts_collection
 
-    async def find_post_by_id(self, id: str) -> PostModel:
-        post = await post_collection.find_one({'_id': ObjectId(id)})
+    async def find_post_by_id(self, post_id: str) -> PostModel:
+        post = await post_collection.find_one({'_id': ObjectId(post_id)})
         return post_helper(post)
 
     async def update_post(self, id: str, post_data: dict) -> PostModel:
