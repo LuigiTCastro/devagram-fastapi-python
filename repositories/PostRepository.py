@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from typing import List
 import motor.motor_asyncio
 from bson import ObjectId
 from helpers.PostHelper import post_helper
@@ -27,13 +27,13 @@ class PostRepository:
         new_post = await post_collection.find_one({'_id': created_post.inserted_id})
         return post_helper(new_post)
 
-    async def find_posts(self):
+    async def find_posts(self) -> List[PostModel]:
         posts_found = await post_collection.aggregate([{
-            '$lookup': {
-                'from': 'user',
-                'localField': 'user_id',
-                'foreignId': '_id',
-                'as': 'user'
+            "$lookup": {
+                "from": "user",
+                "localField": "user_id",
+                "foreignField": "_id",
+                "as": "user"
             }
         }])
 
@@ -43,11 +43,7 @@ class PostRepository:
 
         return posts
 
-    async def find_post_by_email(self, email: str) -> dict:
-        post = await post_collection.find_one({'email': email})
-        return post_helper(post)
-
-    async def find_post_by_id(self, id: str) -> dict:
+    async def find_post_by_id(self, id: str) -> PostModel:
         post = await post_collection.find_one({'_id': ObjectId(id)})
         return post_helper(post)
 

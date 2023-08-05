@@ -15,10 +15,9 @@ router = APIRouter()
 
 @router.post(
     '/register',
-    response_description='Route that creates a new publish.',
+    response_description='Route responsible for creating a new publish.',
     dependencies=[Depends(JwtMiddleware.verify_token)]
 )
-# async def register_post(file: UploadFile = File(...), post: PostCreateModel = Depends(PostCreateModel)):
 async def register_post(
         authorization: str = Header(default=''),
         post: PostCreateModel = Depends(PostCreateModel)
@@ -36,7 +35,7 @@ async def register_post(
         print(error)
 
 
-@router.get('/get', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
+@router.get('/get', response_description='Route responsible for obtaining the data of a publish through the id.', dependencies=[Depends(JwtMiddleware.verify_token)])
 # async def get_post(authorization: str = Header(default='')):
 async def get_post(id: str):
     try:
@@ -56,9 +55,24 @@ async def get_post(id: str):
 
 
 @router.get('/list', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
-async def get_posts():
+async def get_posts_list():
     try:
         result = await postService.list_posts()
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        raise error
+
+
+@router.put('/like/{post_id}', response_description='...', dependencies=[Depends(JwtMiddleware.verify_token)])
+async def post_like(post_id: str, authorization: str = Header(default='')):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await postService.register_like(post_id, logged_user['id'])
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])

@@ -46,3 +46,5 @@ class PostCreateModel(BaseModel):
                 'subtitle': 'string',
             }
         }
+
+

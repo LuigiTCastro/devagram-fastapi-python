@@ -44,7 +44,7 @@ class AuthService:
     async def get_logged_user(self, authorization: str):
         token = authorization.split(' ')[1]
         payload = jwtToken.decode_jwt_token(token)
-        logged_user = await userService.find_user_by_id(payload['id'])
+        logged_user = await userService.find_user_by_id(payload['user_id'])
         result = logged_user['data']
 
         return result
