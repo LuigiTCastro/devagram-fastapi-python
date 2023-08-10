@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field
 from models.UserModel import UserModel
 
 
-class CommentsModel(BaseModel):
+class CommentModel(BaseModel):
     id: Optional[str] = Field(None, alias='_id')
     user: UserModel = Field(...)
     comment: str = Field(...)
@@ -14,7 +14,7 @@ class CommentsModel(BaseModel):
 
     class Config:
         json_schema_extra = {
-            'comment': {
+            'comments': {
                 'id': 'string',
                 'user': 'string',
                 # 'post': 'string',
@@ -24,3 +24,12 @@ class CommentsModel(BaseModel):
         }
 
 
+class CommentCreateModel(BaseModel):
+    comments: str = Field(...)
+
+    class Config:
+        json_schema_extra = {
+            'post': {
+                'comments': 'string'
+            }
+        }

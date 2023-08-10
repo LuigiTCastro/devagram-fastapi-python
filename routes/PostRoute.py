@@ -1,6 +1,7 @@
-from fastapi import APIRouter, UploadFile, HTTPException, Depends, File, Header
+from fastapi import APIRouter, UploadFile, HTTPException, Depends, File, Header, Body
 from middleware.JwtMiddleware import JwtMiddleware
 from models.PostModel import PostCreateModel
+from models.CommentsModel import CommentCreateModel
 from services.AuthService import AuthService
 from services.PostService import PostService
 from services.UserService import UserService
@@ -87,4 +88,28 @@ async def post_like_or_dislike(post_id: str, authorization: str = Header(default
         return result
 
     except Exception as error:
+        raise error
+
+
+@router.put(
+    '/comment/{post_id}',
+    response_description='Responsible route to make a comment in a post.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def register_comment(
+        post_id: str,
+        authorization: str = Header(default=''),
+        comments: CommentCreateModel = Body(...)
+):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await postService.register_comment(post_id, logged_user['id'], comments.comments)
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
         raise error

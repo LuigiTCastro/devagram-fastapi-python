@@ -53,6 +53,7 @@ class UserLoginModel(BaseModel):
             }
         }
 
+
 @decoratorUtil.form_body
 class UserUpdateModel(BaseModel):
     name: str = Field(...)

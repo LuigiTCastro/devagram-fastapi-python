@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from fastapi import UploadFile
 from pydantic import Field, BaseModel
-from models.CommentsModel import CommentsModel
+from models.CommentsModel import CommentModel
 from models.UserModel import UserModel
 from utils.DecoratorUtil import DecoratorUtil
 
@@ -17,9 +17,9 @@ class PostModel(BaseModel):
     date: str
     likes: List
     comments: List
-    user: Optional[UserModel]
     total_likes: int
     total_comments: int
+    user: Optional[UserModel]
 
     class Config:
         json_schema_extra = {
@@ -46,5 +46,3 @@ class PostCreateModel(BaseModel):
                 'subtitle': 'string',
             }
         }
-
-

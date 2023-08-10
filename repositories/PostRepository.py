@@ -20,15 +20,15 @@ class PostRepository:
             'subtitle': post.subtitle,
             'likes': [],
             'comments': [],
-            'data': datetime.now()
+            'date': datetime.now()
         }
 
         created_post = await post_collection.insert_one(post_dict)
         new_post = await post_collection.find_one({'_id': created_post.inserted_id})
         return post_helper(new_post)
 
-    async def find_posts(self) -> List[PostModel]:
-        posts_found = await post_collection.aggregate([{
+    async def find_all_posts(self) -> List[PostModel]:
+        posts_found_cursor = post_collection.aggregate([{
             "$lookup": {
                 "from": "user",
                 "localField": "user_id",
@@ -37,9 +37,11 @@ class PostRepository:
             }
         }])
 
-        posts_collection = []
+        # Convert the cursor to a list
+        posts_found = await posts_found_cursor.to_list(length=None)
 
-        async for post in posts_found:
+        posts_collection = []
+        for post in posts_found:
             posts_collection.append(post_helper(post))
 
         return posts_collection

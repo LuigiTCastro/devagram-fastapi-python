@@ -12,9 +12,9 @@ class UserService:
 
     async def register_user(self, user: UserCreateModel, photo_path):
         try:
-            wanted_user = await userRepository.find_user_by_email(user.email)
+            current_user = await userRepository.find_user_by_email(user.email)
 
-            if wanted_user is not None:
+            if current_user is not None:
                 return {
                     'message': 'User already exists.',
                     'data': '',
@@ -48,11 +48,11 @@ class UserService:
                 'status': 500
             }
 
-    async def find_user_by_id(self, id: str):
+    async def find_user_by_id(self, user_id: str):
         try:
-            wanted_user = await userRepository.find_user_by_id(id)
+            current_user = await userRepository.find_user_by_id(user_id)
 
-            if not wanted_user:
+            if not current_user:
                 return {
                     'message': 'User not found.',
                     'data': '',
@@ -61,7 +61,7 @@ class UserService:
 
             return {
                 'message': 'User found.',
-                'data': wanted_user,
+                'data': current_user,
                 'status': 200
             }
 
@@ -75,9 +75,9 @@ class UserService:
 
     async def list_users(self):
         try:
-            users = await userRepository.find_users()
+            users_list = await userRepository.find_all_users()
 
-            if not users:
+            if not users_list:
                 return {
                     'message': 'Users not found.',
                     'data': '',
@@ -85,8 +85,8 @@ class UserService:
                 }
 
             return {
-                'message': 'User found.',
-                'data': users,
+                'message': 'Users found.',
+                'data': users_list,
                 'status': 200
             }
 
@@ -98,21 +98,33 @@ class UserService:
                 'status': 500
             }
 
-    async def update_logged_user(self, id: str, user_to_update: UserUpdateModel):
+    async def update_logged_user(self, user_id: str, user_data: UserUpdateModel):  # IT'S RETURNING 500. WHY?
         try:
-            wanted_user = await userRepository.find_user_by_id(id)
+            current_user = await userRepository.find_user_by_id(user_id)
 
-            if wanted_user is None:
+            if current_user is None:
                 return {
                     'message': 'User not found.',
                     'data': '',
                     'status': 404
                 }
 
-            else:
-                photo_upload = user_to_update.photo
-                user_dict = user_to_update.__dict__
-                # del user_dict['photo']
+            else:  # Check if the provided email already exists in another user (excluding the current user)
+                user_with_same_email = await userRepository.find_user_by_email(user_data.email)
+                # WHERE IS THE ERROR?
+                # find_user_by_email?
+                # user_data.email?
+                # user_with_same_email['_id'] != current_user['id']?
+                if user_with_same_email and user_with_same_email['_id'] != current_user['id']:
+                    return {
+                        'message': 'This email is already in use by another user.',
+                        'data': '',
+                        'status': 401
+                    }
+
+                photo_upload = user_data.photo
+                user_data_dict = user_data.__dict__
+                # del user_data_dict['photo']
 
                 try:
                     photo_path = f'file/{photo_upload.filename}.png'
@@ -122,16 +134,16 @@ class UserService:
 
                     photo_url = awsProvider.s3_file_upload(
                         photo_path,
-                        f'profile-photos/{id}.png'
+                        f'profile-photos/{user_id}.png'
                     )
 
                     os.remove(photo_path)
 
                 except Exception as error:
-                    print(error)
+                    print(f'{error} A')
 
-                user_dict['photo'] = photo_url if photo_url is not None else user_dict['photo']
-                updated_user = await userRepository.update_user(id, user_dict)
+                user_data_dict['photo'] = photo_url if photo_url is not None else user_data_dict['photo']
+                updated_user = await userRepository.update_user(user_id, user_data_dict)
 
                 return {
                     'message': 'User updated',
@@ -140,8 +152,19 @@ class UserService:
                 }
 
         except Exception as error:
+            print(f'{error} B')
             return {
                 'message': 'Internal server error.',
                 'data': str(error),
                 'status': 500
+            }
+
+    async def delete_user(self, user_id: str):
+        user = await userRepository.find_user_by_id(user_id)
+
+        if not user:
+            return {
+                'message': 'User not found.',
+                'data': '',
+                'status': 404
             }
