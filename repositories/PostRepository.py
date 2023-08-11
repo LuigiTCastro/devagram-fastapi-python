@@ -46,6 +46,40 @@ class PostRepository:
 
         return posts_collection
 
+    async def find_all_user_posts(self, user_id: str) -> List[PostModel]:
+        posts_found = await post_collection.find({'user_id': ObjectId(user_id)}).to_list(length=None)
+
+        posts_collection = []
+
+        for post in posts_found:
+            posts_collection.append(post_helper(post))
+
+        return posts_collection
+
+    # async def find_all_user_posts(self, user_id: str) -> List[PostModel]:
+    #     posts_found = post_collection.aggregate([
+    #         {
+    #             "$match": {
+    #                 "user_id": ObjectId(user_id)
+    #             }
+    #         },
+    #         {
+    #             "$lookup": {
+    #                 "from": "user",
+    #                 "localField": "user_id",
+    #                 "foreignField": "_id",
+    #                 "as": "user"
+    #             }
+    #         }
+    #     ])
+    #
+    #     posts_collection = []
+    #
+    #     async for post in posts_found:
+    #         posts_collection.append(post_helper(post))
+    #
+    #     return posts_collection
+
     async def find_post_by_id(self, post_id: str) -> PostModel:
         post = await post_collection.find_one({'_id': ObjectId(post_id)})
         return post_helper(post)

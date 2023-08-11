@@ -1,14 +1,14 @@
 import os
-
 from bson import ObjectId
-
 from models.CommentsModel import CommentCreateModel
 from models.PostModel import PostCreateModel
 from providers.AWSProvider import AWSProvider
 from repositories.PostRepository import PostRepository
+from repositories.UserRepository import UserRepository
 
 postRepository = PostRepository()
 awsProvider = AWSProvider()
+userRepository = UserRepository()
 
 
 class PostService:
@@ -77,6 +77,30 @@ class PostService:
             posts_found = await postRepository.find_all_posts()
 
             if posts_found is None:
+                return {
+                    'message': 'Posts not found.',
+                    'data': '',
+                    'status': 404
+                }
+
+            return {
+                'message': 'Posts successfully listed.',
+                'data': posts_found,
+                'status': 200
+            }
+
+        except Exception as error:
+            return {
+                'message': 'Internal server error.',
+                'data': str(error),
+                'status': 500
+            }
+
+    async def list_user_posts(self, user_id: str):
+        try:
+            posts_found = await postRepository.find_all_user_posts(user_id)
+
+            if not posts_found:
                 return {
                     'message': 'Posts not found.',
                     'data': '',

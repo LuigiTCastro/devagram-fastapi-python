@@ -72,6 +72,25 @@ async def get_posts_list():
         raise error
 
 
+@router.get(
+    '/list/user/{user_id}',
+    response_description='...',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def get_user_posts_list(user_id: str):
+    try:
+        result = await postService.list_user_posts(user_id)
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
+        raise error
+
+
 @router.put(
     '/like/{post_id}',
     response_description='Responsible route to like/dislike a post.',
