@@ -198,3 +198,35 @@ class PostService:
                 'data': str(error),
                 'status': 500
             }
+
+    async def remove_post_by_id(self, post_id: str, logged_user_id: str):
+        try:
+            post_found = await postRepository.find_post_by_id(post_id)
+
+            if not post_found:
+                return {
+                    'message': 'Posts not found.',
+                    'data': '',
+                    'status': 404
+                }
+
+            if not post_found['user_id'] == logged_user_id:
+                return {
+                    'message': 'Unauthorized action.',
+                    'data': '',
+                    'status': 401
+                }
+
+            await postRepository.remove_post(post_id)
+            return {
+                'message': 'Post deleted successfully.',
+                'data': '',
+                'status': 200
+            }
+
+        except Exception as error:
+            return {
+                'message': 'Internal server error.',
+                'data': str(error),
+                'status': 500
+            }

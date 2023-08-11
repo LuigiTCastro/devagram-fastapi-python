@@ -132,3 +132,23 @@ async def register_comment(
     except Exception as error:
         print(error)
         raise error
+
+
+@router.delete(
+    '/delete/{post_id}',
+    response_description='Responsible route to delete a post by id.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def delete_post(post_id: str, authorization: str = Header(default='')):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await postService.remove_post_by_id(post_id, logged_user['id'])
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
+        raise error

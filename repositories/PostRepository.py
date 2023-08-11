@@ -84,15 +84,16 @@ class PostRepository:
         post = await post_collection.find_one({'_id': ObjectId(post_id)})
         return post_helper(post)
 
-    async def update_post(self, id: str, post_data: dict) -> PostModel:
-        post = await post_collection.find_one({'_id': ObjectId(id)})
+    async def update_post(self, post_id: str, post_data: dict) -> PostModel:
+        post = await post_collection.find_one({'_id': ObjectId(post_id)})
 
         if post:
-            await post_collection.update_one({'_id': ObjectId(id)}, {'$set': post_data})
-            updated_post = await post_collection.find_one({'_id': ObjectId(id)})
+            await post_collection.update_one({'_id': ObjectId(post_id)}, {'$set': post_data})
+            updated_post = await post_collection.find_one({'_id': ObjectId(post_id)})
             return post_helper(updated_post)
 
-    async def remove_post(self, id: str):
-        post = await post_collection.find_one({'_id': ObjectId(id)})
+    async def remove_post(self, post_id: str):
+        post = await post_collection.find_one({'_id': ObjectId(post_id)})
+
         if post:
-            await post_collection.delete_one({'_id': ObjectId(id)})
+            await post_collection.delete_one({'_id': ObjectId(post_id)})
