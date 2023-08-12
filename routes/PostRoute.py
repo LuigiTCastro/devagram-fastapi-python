@@ -115,14 +115,14 @@ async def post_like_or_dislike(post_id: str, authorization: str = Header(default
     response_description='Responsible route to make a comment in a post.',
     dependencies=[Depends(JwtMiddleware.verify_token)]
 )
-async def register_comment(
+async def post_comment(
         post_id: str,
         authorization: str = Header(default=''),
         comments: CommentCreateModel = Body(...)
 ):
     try:
         logged_user = await authService.get_logged_user(authorization)
-        result = await postService.register_comment(post_id, logged_user['id'], comments.comments)
+        result = await postService.register_comment(post_id, logged_user['id'], comments.comments)  # Why comments.comments?
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])

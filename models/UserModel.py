@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import UploadFile
 from pydantic import BaseModel, Field, EmailStr
@@ -13,6 +13,11 @@ class UserModel(BaseModel):
     email: EmailStr = Field(...)
     password: str = Field(...)
     photo: str = Field(...)
+    followers: List
+    following: List
+    total_followers: int
+    total_following: int
+    date: str
 
     class Config:
         json_schema_extra = {

@@ -84,4 +84,9 @@ Important Files:
 
         except Exception as error:
             raise error
-    
+
+
+
+----------------------------------------
+# Use of Naming Pattern:
+Usually, in python, the functions/methods use [snake_case] instead of [camelCase]

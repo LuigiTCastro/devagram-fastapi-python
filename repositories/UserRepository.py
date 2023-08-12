@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 import motor.motor_asyncio
@@ -21,7 +22,17 @@ class UserRepository:
 
     async def create_user(self, user: UserCreateModel) -> dict:
         user.password = authUtil.encrypt_password(user.password)
-        created_user = await user_collection.insert_one(user.__dict__)
+        user_dict = {
+            'name': user.name,
+            'email': user.email,
+            'password': user.password,
+            'followers': [],
+            'following': [],
+            'total_followers': int,
+            'total_following': int,
+            'date': datetime.now()
+        }
+        created_user = await user_collection.insert_one(user_dict)
         # .__dict__: converts the attributes of a class into a dictionary.
 
         new_user = await user_collection.find_one({'_id': created_user.inserted_id})

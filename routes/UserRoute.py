@@ -13,7 +13,7 @@ jwtMid = JwtMiddleware()
 
 
 @router.post('/register', response_description='Route to create a new user.')
-async def register_user(photo: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
+async def post_user(photo: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
     try:
         print(photo.filename)
         photo_path = f'file/{photo.filename}.png'

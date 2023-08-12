@@ -14,3 +14,5 @@ def post_helper(post):
         'total_comments': post['total_comments'] if 'total_comments' in post else '',
         'user': user_helper(post['user'][0]) if 'user' in post and len(post['user']) > 0 else ''
     }
+
+

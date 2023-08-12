@@ -20,7 +20,9 @@ class PostRepository:
             'subtitle': post.subtitle,
             'likes': [],
             'comments': [],
-            'date': datetime.now()
+            'total_likes': int,
+            'total_comments': int,
+            'date': datetime.now(),
         }
 
         created_post = await post_collection.insert_one(post_dict)
