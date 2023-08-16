@@ -17,7 +17,7 @@ class UserModel(BaseModel):
     following: List
     total_followers: int
     total_following: int
-    date: str
+    datetime: str
 
     class Config:
         json_schema_extra = {
@@ -25,7 +25,12 @@ class UserModel(BaseModel):
                 'name': 'string',
                 'email': 'string',
                 'password': 'string',
-                'photo': 'string'
+                'photo': 'string',
+                'followers': 'List',
+                'following': 'List',
+                'total_followers': 'int',
+                'total_following': 'int',
+                'datetime': 'date'
             }
         }
 
@@ -35,13 +40,25 @@ class UserCreateModel(BaseModel):
     name: str = Field(...)
     email: EmailStr = Field(...)
     password: str = Field(...)
+    # followers: List = []
+    # following: List = []
+    # total_followers: int = 0
+    # total_following: int = 0
+    # datetime: str = str(None)
+
+    # FIX THIS!! [WHY ARE THESE ATTRIBUTES BEING REQUIRED, BUT NOT IN TEST_ROUTE?
 
     class Config:
         json_schema_extra = {
             'user': {
                 'name': 'string',
                 'email': 'string',
-                'password': 'string'
+                'password': 'string',
+                # 'followers': 'List',
+                # 'following': 'List',
+                # 'total_followers': 'int',
+                # 'total_following': 'int',
+                # 'datetime': 'date'
             }
         }
 

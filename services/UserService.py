@@ -1,5 +1,5 @@
 import os
-
+from bson import ObjectId
 from models.UserModel import UserCreateModel, UserUpdateModel
 from providers.AWSProvider import AWSProvider
 from repositories.UserRepository import UserRepository
@@ -11,6 +11,7 @@ awsProvider = AWSProvider()
 class UserService:
 
     async def register_user(self, user: UserCreateModel, photo_path):
+        # async def register_user(self, user: UserCreateModel):
         try:
             current_user = await userRepository.find_user_by_email(user.email)
 
@@ -167,4 +168,52 @@ class UserService:
                 'message': 'User not found.',
                 'data': '',
                 'status': 404
+            }
+
+    async def follow_or_unfollow(self, followed_user_id: str, follower_user_id: str):
+        try:
+            followed_user = await userRepository.find_user_by_id(followed_user_id)
+            follower_user = await userRepository.find_user_by_id(follower_user_id)
+
+            print(followed_user)
+            print(follower_user)
+
+            if not followed_user or not follower_user:
+                return {
+                    'message': 'User not found.',
+                    'data': '',
+                    'status': 404
+                }
+
+            if follower_user['following'].count(followed_user['id']) > 0:
+                follower_user['following'].remove(followed_user['id'])
+                followed_user['followers'].remove(follower_user['id'])
+            else:
+                follower_user['following'].append(ObjectId(followed_user['id']))
+                followed_user['followers'].append(ObjectId(follower_user['id']))
+
+            follower_user['total_following'] = len(follower_user['following'])
+            followed_user['total_followers'] = len(followed_user['followers'])
+
+            await userRepository.update_user(follower_user['id'], {
+                'following': follower_user['following'],
+                'total_following': follower_user['total_following']
+            })
+
+            await userRepository.update_user(followed_user['id'], {
+                'followers': followed_user['followers'],
+                'total_followers': followed_user['total_followers'],
+            })
+
+            return {
+                'message': 'Followed user successfully.',
+                'data': '',
+                'status': 200
+            }
+
+        except Exception as error:
+            return {
+                'message': 'Internal server error.',
+                'data': str(error),
+                'status': 500
             }

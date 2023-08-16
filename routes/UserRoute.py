@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File, Body
 from middleware.JwtMiddleware import JwtMiddleware
 from models.UserModel import UserCreateModel, UserUpdateModel
+from services.AuthService import AuthService
 from services.UserService import UserService
 from utils.JwtToken import JwtToken
 
@@ -10,10 +11,12 @@ router = APIRouter()
 userService = UserService()
 jwtToken = JwtToken()
 jwtMid = JwtMiddleware()
+authService = AuthService()
 
 
 @router.post('/register', response_description='Route to create a new user.')
 async def post_user(photo: UploadFile, user: UserCreateModel = Depends(UserCreateModel)):
+    # async def post_user(user: UserCreateModel = Depends(UserCreateModel)):
     try:
         print(photo.filename)
         photo_path = f'file/{photo.filename}.png'
@@ -22,6 +25,7 @@ async def post_user(photo: UploadFile, user: UserCreateModel = Depends(UserCreat
             f.write(photo.file.read())
 
         result = await userService.register_user(user, photo_path)
+        # result = await userService.register_user(user)
         os.remove(photo_path)
 
         if not result['status'] == 201:
@@ -31,8 +35,7 @@ async def post_user(photo: UploadFile, user: UserCreateModel = Depends(UserCreat
         return result
 
     except Exception as error:
-        # print(error)
-        # raise HTTPException(status_code=500, detail='Server internal error.')
+        print(error)
         raise error
 
 
@@ -68,12 +71,8 @@ async def put_user(
         # updated_user: UserUpdateModel = Body(...)
 ):
     try:
-        token = authorization.split(' ')[1]
-        payload = jwtToken.decode_jwt_token(token)
-        # logged_user = await userService.find_user_by_id(payload['user_id'])
-        # result = await userService.update_logged_user(logged_user)
-        # result = await userService.update_logged_user(updated_user)
-        result = await userService.update_logged_user(payload['user_id'], updated_user)
+        logged_user = await authService.get_logged_user(authorization)
+        result = await userService.update_logged_user(logged_user['id'], updated_user)
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])
@@ -99,4 +98,24 @@ async def get_users():
         return result
 
     except Exception as error:
+        raise error
+
+
+@router.put(
+    '/follow/{followed_user_id}',
+    response_description='Responsible route to follow or unfollow an user.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def follow_or_unfollow(followed_user_id: str, authorization: str = Header(default='')):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await userService.follow_or_unfollow(followed_user_id, logged_user['id'])
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
         raise error

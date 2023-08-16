@@ -83,6 +83,7 @@ class TestCreateModel(BaseModel):
     # How to fix this? We see two possibilities below:
         # 1) Using some service that increasing new attributes through of the Update;
         # 2) In the Create moment, pass a dict with the new attributes.
+        # 3) Use all attributes in the CreateModel, but some already with default initial value.
 
 # __________________________________________________________________________________________
 

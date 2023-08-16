@@ -1,6 +1,5 @@
 import os
 from bson import ObjectId
-from models.CommentsModel import CommentCreateModel
 from models.PostModel import PostCreateModel
 from providers.AWSProvider import AWSProvider
 from repositories.PostRepository import PostRepository

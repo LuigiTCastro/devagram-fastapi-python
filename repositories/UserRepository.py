@@ -1,11 +1,10 @@
+import motor.motor_asyncio
 from datetime import datetime
 from typing import List
-
-import motor.motor_asyncio
 from decouple import config
 # from bson import ObjectId
 from bson.objectid import ObjectId
-from models.UserModel import UserCreateModel
+from models.UserModel import UserCreateModel, UserModel
 from utils.AuthUtil import AuthUtil
 from helpers.UserHelper import user_helper
 
@@ -20,7 +19,7 @@ authUtil = AuthUtil()
 
 class UserRepository:
 
-    async def create_user(self, user: UserCreateModel) -> dict:
+    async def create_user(self, user: UserCreateModel) -> UserModel:
         user.password = authUtil.encrypt_password(user.password)
         user_dict = {
             'name': user.name,
@@ -28,9 +27,9 @@ class UserRepository:
             'password': user.password,
             'followers': [],
             'following': [],
-            'total_followers': int,
-            'total_following': int,
-            'date': datetime.now()
+            'total_followers': 0,
+            'total_following': 0,
+            'datetime': datetime.now()
         }
         created_user = await user_collection.insert_one(user_dict)
         # .__dict__: converts the attributes of a class into a dictionary.

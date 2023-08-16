@@ -90,3 +90,13 @@ Important Files:
 ----------------------------------------
 # Use of Naming Pattern:
 Usually, in python, the functions/methods use [snake_case] instead of [camelCase]
+
+
+----------------------------------------
+
+
+``TO FIX:``
+UpdateUser: update_logged_user (service)
+FollowUnfollow
+RegisterPost
+UserCreateModel / user_dict
