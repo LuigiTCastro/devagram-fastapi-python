@@ -37,15 +37,21 @@ class UserRepository:
         new_user = await user_collection.find_one({'_id': created_user.inserted_id})
         return user_helper(new_user)
 
-    async def find_all_users(self) -> List:
-        users_found = await user_collection.find({}).to_list(length=None)
+    async def find_all_users(self, name: str = None) -> List:
+        users_found = await user_collection.find({
+            'name': {
+                '$regex': name,
+                '$options': 'i'  # i: case insensitive
+            }
+        }).to_list(length=None)
 
-        users_collection = []
+        users_filtered = []
 
         for user in users_found:
-            users_collection.append(user_helper(user))
+            if name.lower() in user['name'].lower():
+                users_filtered.append(user_helper(user))
 
-        return users_collection
+        return users_filtered
 
     async def find_user_by_email(self, email: str):
         user = await user_collection.find_one({'email': email})

@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File, Body
+from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File, Body, Query
 from middleware.JwtMiddleware import JwtMiddleware
 from models.UserModel import UserCreateModel, UserUpdateModel
 from services.AuthService import AuthService
@@ -85,12 +85,12 @@ async def put_user(
 
 @router.get(
     '/users',
-    response_description='...',
+    response_description='Responsible route to list all users from database.',
     dependencies=[Depends(JwtMiddleware.verify_token)]
 )
-async def get_users():
+async def get_users_list(name: str = None):
     try:
-        result = await userService.list_users()
+        result = await userService.list_users(name)
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])

@@ -74,9 +74,9 @@ class UserService:
                 'status': 500
             }
 
-    async def list_users(self):
+    async def list_users(self, name: str = None):
         try:
-            users_list = await userRepository.find_all_users()
+            users_list = await userRepository.find_all_users(name)
 
             if not users_list:
                 return {
