@@ -2,7 +2,7 @@ import motor.motor_asyncio
 from datetime import datetime
 from typing import List
 from decouple import config
-# from bson import ObjectId
+from bson import ObjectId
 from bson.objectid import ObjectId
 from models.UserModel import UserCreateModel, UserModel
 from utils.AuthUtil import AuthUtil
@@ -27,8 +27,10 @@ class UserRepository:
             'password': user.password,
             'followers': [],
             'following': [],
+            # 'posts': [],
             'total_followers': 0,
             'total_following': 0,
+            # 'total_posts': 0,
             'datetime': datetime.now()
         }
         created_user = await user_collection.insert_one(user_dict)

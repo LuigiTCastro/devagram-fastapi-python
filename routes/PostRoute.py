@@ -91,6 +91,25 @@ async def get_user_posts_list(user_id: str):
         raise error
 
 
+@router.delete(
+    '/delete/{post_id}',
+    response_description='Responsible route to delete a post by id.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+async def delete_post(post_id: str, authorization: str = Header(default='')):
+    try:
+        logged_user = await authService.get_logged_user(authorization)
+        result = await postService.remove_post_by_id(post_id, logged_user['id'])
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
+        raise error
+
 @router.put(
     '/like/{post_id}',
     response_description='Responsible route to like/dislike a post.',
@@ -118,11 +137,12 @@ async def post_like_or_dislike(post_id: str, authorization: str = Header(default
 async def post_comment(
         post_id: str,
         authorization: str = Header(default=''),
-        comments: CommentCreateModel = Body(...)
+        comment: CommentCreateModel = Body(...)
 ):
     try:
         logged_user = await authService.get_logged_user(authorization)
-        result = await postService.register_comment(post_id, logged_user['id'], comments.comments)  # Why comments.comments?
+        result = await postService.register_comment(post_id, logged_user['id'],
+                                                    comment.comments)  # Why comment.comments and not comment['comments']?
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])
@@ -134,15 +154,56 @@ async def post_comment(
         raise error
 
 
+# @router.get(
+#     '/get/{post_id}/{comment_id}',
+#     response_description='Route responsible for obtaining the data of a publish through the id.',
+#     dependencies=[Depends(JwtMiddleware.verify_token)]
+# )
+# async def get_comment(post_id: str, comment_id: str):
+#     try:
+#         result = await postService.find_comment_by_id(post_id, comment_id)
+#
+#         if not result['status'] == 200:
+#             raise HTTPException(status_code=result['status'], detail=result['message'])
+#
+#         return result
+#
+#     except Exception as error:
+#         raise error
+
 @router.delete(
-    '/delete/{post_id}',
-    response_description='Responsible route to delete a post by id.',
+    '/delete/comment/{post_id}/{comment_id}',
+    response_description='Responsible route to delete a comment.',
     dependencies=[Depends(JwtMiddleware.verify_token)]
 )
-async def delete_post(post_id: str, authorization: str = Header(default='')):
+async def delete_comment(post_id, comment_id, authorization: str = Header(default='')):
     try:
         logged_user = await authService.get_logged_user(authorization)
-        result = await postService.remove_post_by_id(post_id, logged_user['id'])
+        result = await postService.remove_comment_by_id(post_id, comment_id, logged_user['id'])
+        print(comment_id)
+        # print(post_id)
+        print(result)
+
+        if not result['status'] == 200:
+            raise HTTPException(status_code=result['status'], detail=result['message'])
+
+        return result
+
+    except Exception as error:
+        print(error)
+        raise error
+
+
+@router.put(
+    '/update/{post_id}/comment/{comment_id}',
+    response_description='Responsible route that updates a specific comment.',
+    dependencies=[Depends(JwtMiddleware.verify_token)]
+)
+# async def put_comment(post_id: str, comment_id: str, comment: CommentCreateModel = Body(...), authorization: str = Header(default='')):
+async def put_comment(post_id: str, comment_id: str, comment: CommentCreateModel = Body(...)):
+    try:
+        # logged_user = await authService.get_logged_user(authorization)
+        result = await postService.update_comment(post_id, comment_id, comment.comments)
 
         if not result['status'] == 200:
             raise HTTPException(status_code=result['status'], detail=result['message'])

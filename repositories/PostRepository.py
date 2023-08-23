@@ -20,8 +20,8 @@ class PostRepository:
             'subtitle': post.subtitle,
             'likes': [],
             'comments': [],
-            'total_likes': int,
-            'total_comments': int,
+            'total_likes': 0,
+            'total_comments': 0,
             'date': datetime.now(),
         }
 
@@ -41,6 +41,7 @@ class PostRepository:
 
         # Convert the cursor to a list
         posts_found = await posts_found_cursor.to_list(length=None)
+        print(posts_found)
 
         posts_collection = []
         for post in posts_found:
@@ -95,7 +96,27 @@ class PostRepository:
             return post_helper(updated_post)
 
     async def remove_post(self, post_id: str):
-        post = await post_collection.find_one({'_id': ObjectId(post_id)})
+        post_found = await post_collection.find_one({'_id': ObjectId(post_id)})
 
-        if post:
+        if post_found:
             await post_collection.delete_one({'_id': ObjectId(post_id)})
+
+    # async def find_comment_by_id(self, post_id: str, comment_id: str) -> dict:
+    #     pipeline = [
+    #         {"$match": {"_id": ObjectId(post_id)}},  # Match para encontrar o post pelo _id
+    #         {"$unwind": "$comments"},  # Desdobrar a lista de comentários
+    #         {"$match": {"comments.comment_id": ObjectId(comment_id)}},  # Match pelo comment_id
+    #         {"$project": {"comments": 1}}  # Projeto para exibir somente o comentário correspondente
+    #     ]
+    #
+    #     result = await post_collection.aggregate(pipeline).to_list(length=None)
+    #
+    #     if result:
+    #         comment = result[0]['comments']
+    #         return comment
+    #     else:
+    #         return None  # Comentário não encontrado ou post não existe
+
+    # async def find_comment_by_id(self, comment_id: str) -> dict:
+    #     comment = await post_collection.find_one({'comments[comment_id]': ObjectId(comment_id)})
+    #     return comment

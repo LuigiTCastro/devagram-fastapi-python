@@ -91,6 +91,12 @@ Important Files:
 # Use of Naming Pattern:
 Usually, in python, the functions/methods use [snake_case] instead of [camelCase]
 
+----------------------------------------
+
+# Libs Storage
+Libraries installed in a Python API using `pip` are stored in a specific directory in the 
+virtual environment or conda environment, depending on how the environment was configured. 
+Usually, they are not in folders like 'node_modules' or libs.
 
 ----------------------------------------
 
@@ -98,5 +104,10 @@ Usually, in python, the functions/methods use [snake_case] instead of [camelCase
 ``TO FIX:``
 UpdateUser: update_logged_user (service)
 FollowUnfollow
-RegisterPost
 UserCreateModel / user_dict
+Delete Comment [{'message': 'Internal server error.', 'data': "string indices must be integers, not 'str'", 'status': 500}]
+Update Comment [{'message': 'Internal server error.', 'data': "string indices must be integers, not 'str'", 'status': 500}]
+List Posts [o problema está em post_helper: 'comments']
+
+``TO CREATE``
+Posts in UserModel

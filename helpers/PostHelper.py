@@ -10,6 +10,17 @@ def post_helper(post):
         'date': post['date'] if 'date' in post else '',
         'likes': [str(p) for p in post['likes']] if 'likes' in post else '',
         'comments': [str(p) for p in post['comments']] if 'comments' in post else '',
+
+        # 'comments': [
+        #     {
+        #         'comment_id': str(p['comment_id']),
+        #         'user_id': str(p['user_id']),
+        #         'post_id': str(p['post_id']),
+        #         'comments': p['comment']
+        #     } for p in post['comments']
+        # ] if 'comments' in post else '',
+
+
         'total_likes': post['total_likes'] if 'total_likes' in post else '',
         'total_comments': post['total_comments'] if 'total_comments' in post else '',
         'user': user_helper(post['user'][0]) if 'user' in post and len(post['user']) > 0 else ''

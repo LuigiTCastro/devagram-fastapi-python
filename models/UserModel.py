@@ -15,8 +15,10 @@ class UserModel(BaseModel):
     photo: str = Field(...)
     followers: List
     following: List
+    # posts: List
     total_followers: int
     total_following: int
+    # total_posts: int
     datetime: str
 
     class Config:
@@ -28,8 +30,10 @@ class UserModel(BaseModel):
                 'photo': 'string',
                 'followers': 'List',
                 'following': 'List',
+                # 'posts': 'List',
                 'total_followers': 'int',
                 'total_following': 'int',
+                # 'total_posts': 'int',
                 'datetime': 'date'
             }
         }

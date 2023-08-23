@@ -13,8 +13,8 @@ userRepository = UserRepository()
 class PostService:
     async def register_post(self, post: PostCreateModel, user_id):
         try:
+            # current_user = await userRepository.find_user_by_id(user_id)
             created_post = await postRepository.create_post(post, user_id)
-            # photo_upload = created_post.photo
             photo_upload = post.photo
 
             try:
@@ -28,7 +28,16 @@ class PostService:
                     f'publish-photos/{created_post["id"]}.png'
                 )
 
-                new_post = await postRepository.update_post(created_post['id'], {'photo': photo_url})
+                # current_user['posts'].append(created_post['id'])
+                # current_user['total_posts'] = len(current_user['posts'])
+
+                new_post = await postRepository.update_post(created_post['id'], {
+                    'photo': photo_url
+                })
+                # updated_user = await userRepository.update_user(current_user['id'], {
+                #     'posts': current_user['posts'],
+                #     'total_posts': current_user['total_posts']
+                # })
                 os.remove(photo_path)
 
             except Exception as error:
@@ -74,6 +83,7 @@ class PostService:
     async def list_posts(self):
         try:
             posts_found = await postRepository.find_all_posts()
+            # print(posts_found)
 
             if posts_found is None:
                 return {
@@ -109,6 +119,38 @@ class PostService:
             return {
                 'message': 'Posts successfully listed.',
                 'data': posts_found,
+                'status': 200
+            }
+
+        except Exception as error:
+            return {
+                'message': 'Internal server error.',
+                'data': str(error),
+                'status': 500
+            }
+
+    async def remove_post_by_id(self, post_id: str, logged_user_id: str):
+        try:
+            post_found = await postRepository.find_post_by_id(post_id)
+
+            if not post_found:
+                return {
+                    'message': 'Posts not found.',
+                    'data': '',
+                    'status': 404
+                }
+
+            if not post_found['user_id'] == logged_user_id:
+                return {
+                    'message': 'Unauthorized action.',
+                    'data': '',
+                    'status': 401
+                }
+
+            await postRepository.remove_post(post_id)
+            return {
+                'message': 'Post deleted successfully.',
+                'data': '',
                 'status': 200
             }
 
@@ -163,7 +205,7 @@ class PostService:
                 'status': 500
             }
 
-    async def register_comment(self, post_id: str, user_id: str, comments: str):
+    async def register_comment(self, post_id: str, user_id: str, comment: str):
         try:
             post_found = await postRepository.find_post_by_id(post_id)
 
@@ -175,8 +217,10 @@ class PostService:
                 }
 
             post_found['comments'].append({
+                'comment_id': ObjectId(),
                 'user_id': ObjectId(user_id),
-                'comments': comments
+                'post_id': ObjectId(post_id),
+                'comment': comment
             })
             post_found['total_comments'] = len(post_found['comments'])
 
@@ -198,28 +242,141 @@ class PostService:
                 'status': 500
             }
 
-    async def remove_post_by_id(self, post_id: str, logged_user_id: str):
+    # async def find_comment_by_id(self, post_id: str, comment_id: str):
+    #     try:
+    #         comment_found = await postRepository.find_comment_by_id(post_id, comment_id)
+    #
+    #         if comment_found is None:
+    #             return {
+    #                 'message': 'Comment not found.',
+    #                 'data': '',
+    #                 'status': 404
+    #             }
+    #
+    #         return {
+    #             'message': 'Comment successfully found.',
+    #             'data': comment_found,
+    #             'status': 200
+    #         }
+    #
+    #     except Exception as error:
+    #         return {
+    #             'message': 'Internal server error.',
+    #             'data': error,
+    #             'status': 500
+    #         }
+
+    # async def update_comment(self, post_id: str, comment_id: str, logged_user_id: str, comment: str):
+    async def update_comment(self, post_id: str, comment_id: str, comment: str):
         try:
             post_found = await postRepository.find_post_by_id(post_id)
 
             if not post_found:
                 return {
-                    'message': 'Posts not found.',
+                    'message': 'Post not found.',
                     'data': '',
                     'status': 404
                 }
 
-            if not post_found['user_id'] == logged_user_id:
+            for c in post_found['comments']:
+                if c['comment_id'] == comment_id:
+                    c['comments'] = comment
+
+            updated_post = await postRepository.update_post(post_found['id'], {
+                'comments': post_found['comments'],
+            })
+
+            return {
+                'message': 'Comment updated successfully.',
+                'data': updated_post,
+                'status': 200
+            }
+
+        except Exception as error:
+            print(error)
+            return {
+                'message': 'Internal server error.',
+                'data': '',
+                'status': 500
+            }
+
+    # async def remove_comment_by_id(self, post_id: str, comment_id: str, logged_user_id: str):
+    #     try:
+    #         # comment_found = await postRepository.find_comment_by_id(comment_id)
+    #         # post_found = await postRepository.find_post_by_id(comment_found['post_id'])
+    #         post_found = await postRepository.find_post_by_id(post_id)
+    #
+    #         for comment in post_found['comments']:
+    #             # if not comment['user_id'] == logged_user_id:
+    #             #     return {
+    #             #         'message': 'Unauthorized action.',
+    #             #         'data': '',
+    #             #         'status': 401
+    #             #     }
+    #
+    #             if comment['comment_id'] == comment_id:
+    #                 post_found['comments'].remove(comment)
+    #
+    #         post_found['total_comments'] = len(post_found['comments'])
+    #
+    #         updated_post = await postRepository.update_post(post_found['id'], {
+    #             'comments': post_found['comments'],
+    #             'total_comments': post_found['total_comments']
+    #         })
+    #
+    #         return {
+    #             'message': 'Comment deleted successfully.',
+    #             'data': updated_post,
+    #             'status': 200
+    #         }
+    #
+    #     except Exception as error:
+    #         return {
+    #             'message': 'Internal server error.',
+    #             'data': str(error),
+    #             'status': 500
+    #         }
+
+    async def remove_comment_by_id(self, post_id, comment_id, logged_user_id: str):
+        try:
+
+            post_found = await postRepository.find_post_by_id(post_id)
+
+            found_comment = None
+            # comment_id_obj = ObjectId(comment_id)
+
+            for comment in post_found['comments']:
+                if not comment['user_id'] == logged_user_id:
+                    return {
+                        'message': 'Unauthorized action.',
+                        'data': '',
+                        'status': 401
+                    }
+
+                if comment['comment_id'] == comment_id:
+                    found_comment = comment
+                    break
+
+
+            if found_comment is None:
                 return {
-                    'message': 'Unauthorized action.',
+                    'message': 'Comment not found.',
                     'data': '',
-                    'status': 401
+                    'status': 404
                 }
 
-            await postRepository.remove_post(post_id)
+            post_found['comments'].remove(found_comment)
+
+            post_found['total_comments'] = len(post_found['comments'])
+
+            updated_post = await postRepository.update_post(post_id, {
+                'comments': post_found['comments'],
+                'total_comments': post_found['total_comments']
+            })
+
             return {
-                'message': 'Post deleted successfully.',
-                'data': '',
+                'message': 'Comment deleted successfully.',
+                'data': updated_post,
                 'status': 200
             }
 
