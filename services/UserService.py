@@ -102,6 +102,7 @@ class UserService:
     async def update_logged_user(self, user_id: str, user_data: UserUpdateModel):  # IT'S RETURNING 500. WHY?
         try:
             current_user = await userRepository.find_user_by_id(user_id)
+            print(f'curret_user: {current_user}')
 
             if current_user is None:
                 return {
@@ -112,11 +113,9 @@ class UserService:
 
             else:  # Check if the provided email already exists in another user (excluding the current user)
                 user_with_same_email = await userRepository.find_user_by_email(user_data.email)
-                # WHERE IS THE ERROR?
-                # find_user_by_email?
-                # user_data.email?
-                # user_with_same_email['_id'] != current_user['id']?
-                if user_with_same_email and user_with_same_email['_id'] != current_user['id']:
+                print(f'user_with_same_email: {user_with_same_email}')
+
+                if user_with_same_email and str(user_with_same_email['_id']) != current_user['id']:
                     return {
                         'message': 'This email is already in use by another user.',
                         'data': '',
