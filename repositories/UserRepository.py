@@ -27,10 +27,10 @@ class UserRepository:
             'password': user.password,
             'followers': [],
             'following': [],
-            # 'posts': [],
+            'posts': [],
             'total_followers': 0,
             'total_following': 0,
-            # 'total_posts': 0,
+            'total_posts': 0,
             'datetime': datetime.now()
         }
         created_user = await user_collection.insert_one(user_dict)

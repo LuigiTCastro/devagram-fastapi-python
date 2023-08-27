@@ -15,10 +15,10 @@ class UserModel(BaseModel):
     photo: str = Field(...)
     followers: List
     following: List
-    # posts: List
+    posts: List
     total_followers: int
     total_following: int
-    # total_posts: int
+    total_posts: int
     datetime: str
 
     class Config:
@@ -30,10 +30,10 @@ class UserModel(BaseModel):
                 'photo': 'string',
                 'followers': 'List',
                 'following': 'List',
-                # 'posts': 'List',
+                'posts': 'List',
                 'total_followers': 'int',
                 'total_following': 'int',
-                # 'total_posts': 'int',
+                'total_posts': 'int',
                 'datetime': 'date'
             }
         }
@@ -46,8 +46,10 @@ class UserCreateModel(BaseModel):
     password: str = Field(...)
     # followers: List = []
     # following: List = []
+    # posts: List = []
     # total_followers: int = 0
     # total_following: int = 0
+    # total_posts: int = 0
     # datetime: str = str(None)
 
     # FIX THIS!! [WHY ARE THESE ATTRIBUTES BEING REQUIRED, BUT NOT IN TEST_ROUTE?
@@ -60,8 +62,10 @@ class UserCreateModel(BaseModel):
                 'password': 'string',
                 # 'followers': 'List',
                 # 'following': 'List',
+                # 'posts': 'List',
                 # 'total_followers': 'int',
                 # 'total_following': 'int',
+                # 'total_posts': 'int',
                 # 'datetime': 'date'
             }
         }

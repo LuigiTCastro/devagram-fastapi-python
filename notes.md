@@ -102,7 +102,7 @@ Usually, they are not in folders like 'node_modules' or libs.
 
 
 ``TO FIX:``
-UpdateUser: update_logged_user (service)
+UpdateUser: update_logged_user (service) [PARTIALLY CORRECTED]
 FollowUnfollow
 UserCreateModel / user_dict
 Delete Comment [{'message': 'Internal server error.', 'data': "string indices must be integers, not 'str'", 'status': 500}]
